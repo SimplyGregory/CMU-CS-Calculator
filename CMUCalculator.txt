@@ -1,0 +1,86 @@
+from cmu_graphics import *
+app.background=rgb(31,31,31)
+Rect(50,40,300,75,fill=rgb(69, 71, 70))
+Rect(55,45,290,65,fill=rgb(31, 31, 31))
+CalculatorButtons = ["(", "7", "4", "1", "0", ")", "8", "5", "2", ".", "%", "9", "6", "3", "=", "AC", "/", "*", "-", "+"]
+
+CurrentText = 0
+TextWiped = True
+LetterCount = 0
+Buttons = Group()
+EqualButton = Group()
+
+xButtonCount = 0
+yButtonCount = 0
+xi = 0
+yi = 0
+CurrentButtonCount = 0
+for xButtonCount in range(4):
+    for yButtonCount in range(5):
+        CurrentButton = 0
+        if (yButtonCount >= 1 and xButtonCount < 3) and (yButtonCount != 4 and xButtonCount != 2):
+            Button = Rect(55 + xi,120 + yi,65,40,fill=rgb(51, 52, 56))
+            Buttons.add(Button)
+            CurrentButton = Button
+        else:
+            if  yButtonCount == 4 and xButtonCount == 2:
+                Button = Rect(55 + xi,120 + yi,65,40,fill=rgb(179, 199, 245))
+                EqualButton.add(Button)
+                CurrentButton = Button
+            else:
+                Button = Rect(55 + xi,120 + yi,65,40,fill=rgb(45, 48, 60))
+                Buttons.add(Button)
+                CurrentButton = Button
+            
+        Label(CalculatorButtons[CurrentButtonCount], (55 + xi) + (65/2), (120 + yi) + (40/2), size=18, bold=False, fill="white")
+        CurrentButton.Worth = CalculatorButtons[CurrentButtonCount]
+        CurrentButtonCount += 1
+        yi += 50
+    xi += 75
+    yi = 0
+
+l = Label("0", 320,80, size=30, bold=True, fill="white")
+
+def UpdateText(MoveY):
+    global CurrentText
+    l.value = CurrentText
+    if MoveY == True:
+        l.centerX -= (1 * LetterCount)
+
+def onMousePress(mouseX, mouseY):
+    global TextWiped
+    global LetterCount
+    global CurrentText
+    HitButton = Buttons.hitTest(mouseX, mouseY)
+    
+    if HitButton is not None:
+        
+        if LetterCount >= 15:
+            return
+        
+        if HitButton.Worth == "AC":
+            TextWiped = True
+            LetterCount = 0
+            CurrentText = "0"
+        else:
+            if TextWiped:
+                CurrentText = HitButton.Worth
+                TextWiped = False
+                LetterCount = 0
+            else:
+                CurrentText = CurrentText + HitButton.Worth
+                LetterCount += 1   
+            
+        UpdateText(True)
+        return
+    
+    HitButton = EqualButton.hitTest(mouseX, mouseY)
+    if HitButton is not None:
+        FinalValue = str(eval(CurrentText))
+        print(FinalValue)
+        CurrentText = FinalValue
+        
+        
+    UpdateText(False)
+    return
+    
